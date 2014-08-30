@@ -30,7 +30,7 @@
     :onyx/doc "Writes segments to a core.async channel"}])
 
 (defn increment [segment]
-  (assoc segment :n (inc (:n segment))))
+  (update-in segment [:n] inc))
 
 (def in-chan (chan 10000))
 
@@ -61,7 +61,7 @@
 
 (def conn (onyx.api/connect :memory coord-opts))
 
-(def n-segments 15)
+(def n-segments 10)
 
 (doseq [n (range n-segments)]
   (>!! in-chan {:n n}))
@@ -76,7 +76,7 @@
 
 (def results (doall (map (fn [x] (<!! out-chan)) (range (inc n-segments)))))
 
-(prn results)
+(clojure.pprint/pprint results)
 
 (doseq [v-peer v-peers]
   ((:shutdown-fn v-peer)))
