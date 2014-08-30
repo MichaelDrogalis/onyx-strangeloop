@@ -132,7 +132,7 @@
 
 (def results (take-segments! out-chan))
 
-(prn results)
+(clojure.pprint/pprint results)
 
 (doseq [v-peer v-peers]
   ((:shutdown-fn v-peer)))
