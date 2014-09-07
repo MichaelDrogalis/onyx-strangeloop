@@ -4,7 +4,7 @@
             [onyx.plugin.core-async]
             [onyx.api]))
 
-(def workflow {:input {:increment :output}})
+(def workflow {:input {:transform-person :output}})
 
 (def catalog
   [{:onyx/name :input
@@ -15,8 +15,8 @@
     :onyx/batch-size 25
     :onyx/doc "Reads segments from a core.async channel"}
 
-   {:onyx/name :increment
-    :onyx/fn :strangeloop-demo.core-async-demo/increment
+   {:onyx/name :transform-person
+    :onyx/fn :strangeloop-demo.core-async-demo/transform-person
     :onyx/type :transformer
     :onyx/consumption :concurrent
     :onyx/batch-size 25}
@@ -29,8 +29,10 @@
     :onyx/batch-size 25
     :onyx/doc "Writes segments to a core.async channel"}])
 
-(defn increment [segment]
-  (update-in segment [:n] inc))
+(defn transform-person [segment]
+  (-> segment
+      (update-in [:name] clojure.string/upper-case)
+      (update-in [:age] inc)))
 
 (def in-chan (chan 10000))
 
@@ -61,12 +63,14 @@
 
 (def conn (onyx.api/connect :memory coord-opts))
 
-(def n-segments 10)
+(def records
+  [{:name "Mike" :age 23}
+   {:name "John" :age 18}
+   {:name "Kristen" :age 24}
+   :done])
 
-(doseq [n (range n-segments)]
-  (>!! in-chan {:n n}))
-
-(>!! in-chan :done)
+(doseq [record records]
+  (>!! in-chan record))
 
 (close! in-chan)
 
@@ -74,7 +78,7 @@
 
 (onyx.api/submit-job conn {:catalog catalog :workflow workflow})
 
-(def results (doall (map (fn [x] (<!! out-chan)) (range (inc n-segments)))))
+(def results (doall (map (fn [x] (<!! out-chan)) (range (count records)))))
 
 (clojure.pprint/pprint results)
 
