@@ -38,10 +38,10 @@
 
 (def out-chan (chan 10000))
 
-(defmethod l-ext/inject-lifecycle-resources [:input :core.async]
+(defmethod l-ext/inject-lifecycle-resources :input
   [_ _] {:core-async/in-chan in-chan})
 
-(defmethod l-ext/inject-lifecycle-resources [:output :core.async]
+(defmethod l-ext/inject-lifecycle-resources :output
   [_ _] {:core-async/out-chan out-chan})
 
 (def id (java.util.UUID/randomUUID))
