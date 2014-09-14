@@ -67,6 +67,9 @@
   [{:name "Mike" :age 23}
    {:name "John" :age 18}
    {:name "Kristen" :age 24}
+   {:name "Derek" :age 22}
+   {:name "Dorrene" :age 23}
+   {:name "Chris" :age 24}
    :done])
 
 (doseq [record records]
